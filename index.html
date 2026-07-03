@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nuestra Boda - Invitación</title>
+
+<!-- Paquete de Fuentes de Google -->
+<link href="https://fonts.googleapis.com/css2?family=Allura&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Josefin+Sans:wght@300;400;600&family=Lora:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400;500&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500&family=Sacramento&display=swap" rel="stylesheet">
+<!-- Iconos FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+/* ==========================================================================
+   VARIABLES CSS (Se inyectan desde el panel CONFIG de JS)
+   ========================================================================== */
+:root {
+  --fondo-general: #eef2f5;
+  --color-papel: #ffffff;
+  --texto-principal: #3a3532;
+  --acento: #8c735a;
+  --caja-secundaria: #f7f4f0;
+  --boton-fondo: #8c735a;
+  --boton-texto: #ffffff;
+  --fuente-titulo: 'Great Vibes', cursive;
+  --fuente-texto: 'Cormorant Garamond', serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--fuente-texto);
+  background-color: var(--fondo-general);
+  color: var(--texto-principal);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   BOTÓN DE MÚSICA FLOTANTE
+   ========================================================================== */
+.music-float {
+  position: fixed;
+  bottom: 25px; right: 25px;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--boton-fondo);
+  color: var(--boton-texto);
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  display: grid; place-items: center;
+  font-size: 1.3rem;
+  cursor: pointer;
+  z-index: 9999;
+  transition: transform 0.3s ease;
+}
+.music-float:hover { transform: scale(1.1); }
+.music-float.playing { animation: pulsoMusica 2s infinite; }
+@keyframes pulsoMusica {
+  0% { box-shadow: 0 0 0 0 rgba(140, 115, 90, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(140, 115, 90, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(140, 115, 90, 0); }
+}
+
+/* ==========================================================================
+   CONTENEDOR PRINCIPAL TIPO APP / TARJETA VERTICAL
+   ========================================================================== */
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--fondo-general);
+  position: relative;
+  box-shadow: 0 0 30px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   SISTEMA DE CAPAS Y PAPEL RASGADO REALISTA (TORN PAPER EFFECT)
+   ========================================================================== */
+.photo-background-section {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  overflow: hidden;
+  z-index: 1;
+}
+.photo-background-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Capa de Papel Rasgado */
+.torn-paper-layer {
+  position: relative;
+  background: var(--color-papel);
+  padding: 40px 25px 50px;
+  margin-top: -60px; /* Superposición sobre la foto superior */
+  margin-bottom: -60px; /* Superposición sobre la foto inferior */
+  z-index: 10;
+  /* Sombra 3D realista que se proyecta sobre la foto del fondo */
+  filter: drop-shadow(0px -8px 6px rgba(0,0,0,0.18)) drop-shadow(0px 8px 6px rgba(0,0,0,0.18));
+}
+
+/* El borde SVG superior rasgado */
+.torn-border-top {
+  position: absolute;
+  top: -28px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  overflow: hidden;
+  line-height: 0;
+}
+.torn-border-top svg {
+  width: 100%;
+  height: 30px;
+  fill: var(--color-papel);
+}
+
+/* El borde SVG inferior rasgado */
+.torn-border-bottom {
+  position: absolute;
+  bottom: -28px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  overflow: hidden;
+  line-height: 0;
+  transform: rotate(180deg);
+}
+.torn-border-bottom svg {
+  width: 100%;
+  height: 30px;
+  fill: var(--color-papel);
+}
+
+/* Capa de color suave para intercalar (estilo celeste/lila en tu captura) */
+.torn-paper-layer.color-tint {
+  background: var(--caja-secundaria);
+  z-index: 11;
+  margin-top: -40px;
+  margin-bottom: -40px;
+}
+.torn-paper-layer.color-tint .torn-border-top svg,
+.torn-paper-layer.color-tint .torn-border-bottom svg {
+  fill: var(--caja-secundaria);
+}
+
+/* ==========================================================================
+   TIPOGRAFÍA Y ESTILOS
+   ========================================================================== */
+h1, h2, h3 {
+  font-family: var(--fuente-titulo);
+  color: var(--acento);
+  font-weight: normal;
+  text-align: center;
+}
+h1 { font-size: clamp(3rem, 10vw, 4.2rem); line-height: 1.1; margin: 15px 0; }
+h2 { font-size: clamp(2.2rem, 8vw, 3rem); margin-bottom: 15px; }
+h3 { font-size: 1.6rem; }
+
+p { font-size: 1.15rem; text-align: center; margin-bottom: 15px; }
+
+.subtitle {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 0.8rem;
+  color: var(--texto-principal);
+  opacity: 0.7;
+  display: block;
+  text-align: center;
+  margin-bottom: 5px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.icon-decor {
+  font-size: 1.5rem;
+  color: var(--acento);
+  display: block;
+  text-align: center;
+  margin: 10px auto;
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   BOTONES Y ELEMENTOS
+   ========================================================================== */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: var(--boton-fondo);
+  color: var(--boton-texto);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 12px 25px;
+  border-radius: 30px;
+  text-decoration: none;
+  border: 1px solid var(--boton-fondo);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin: 20px auto;
+  max-width: 280px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+.btn:hover {
+  background-color: transparent;
+  color: var(--boton-fondo);
+  transform: translateY(-2px);
+}
+
+/* Cuenta Regresiva */
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-width: 350px;
+  margin: 20px auto;
+}
+.time-box {
+  background: var(--caja-secundaria);
+  padding: 10px 5px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.time-box span {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--acento);
+  display: block;
+  line-height: 1;
+}
+.time-box small { font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; }
+
+/* Tarjetas de Evento */
+.event-box {
+  background: var(--caja-secundaria);
+  padding: 25px 15px;
+  border-radius: 12px;
+  margin: 15px 0;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Regalos / Datos Bancarios */
+.gift-box {
+  background: var(--caja-secundaria);
+  border: 1px dashed var(--acento);
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 15px;
+  text-align: left;
+  display: none;
+}
+.gift-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 8px 0;
+  font-size: 0.95rem;
+}
+.copy-btn {
+  background: var(--acento);
+  color: #fff;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+/* Carrusel */
+.carousel {
+  position: relative;
+  max-width: 380px;
+  margin: 20px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.carousel-track { display: flex; transition: transform 0.5s ease; }
+.carousel-slide { min-width: 100%; height: 380px; }
+.carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+.carousel-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,0.8); border: none;
+  width: 35px; height: 35px; border-radius: 50%;
+  cursor: pointer; color: var(--acento); font-size: 1rem; z-index: 10;
+}
+.prev-btn { left: 10px; } .next-btn { right: 10px; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Botón de Música -->
+<button id="btnMusic" class="music-float" aria-label="Música" onclick="toggleMusic()">
+  <i id="iconMusic" class="fa-solid fa-music"></i>
+</button>
+<audio id="audioPlayer" loop preload="auto">
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<div class="app-container">
+
+  <!-- FOTO DE FONDO 1 (PORTADA) -->
+  <div class="photo-background-section" style="height: 520px;">
+    <img id="imgPortada" src="foto1.jpg" alt="Novios Portada">
+  </div>
+
+  <!-- CAPA PAPEL RASGADO 1: NOMBRES Y FECHA -->
+  <div class="torn-paper-layer">
+    <!-- Borde SVG superior rasgado -->
+    <div class="torn-border-top">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,0 L0,100 Q150,80 300,110 T600,90 T900,110 Q1050,80 1200,100 L1200,0 Z" opacity="0"></path>
+        <path d="M0,30 Q80,90 180,50 T380,80 T560,40 T740,80 T920,45 T1100,80 L1200,50 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+
+    <span class="subtitle" id="txtPreTitulo">¡Nos casamos!</span>
+    <h1 id="txtNombres">Nombre & Nombre</h1>
+    <i class="fa-solid fa-heart icon-decor" style="font-size: 1.1rem;"></i>
+    <p id="txtFechaPortada" style="font-weight: bold; font-size: 1.3rem; margin-top: 5px;">23 de Octubre de 2026</p>
+    <p id="txtFrasePortada" style="font-style: italic; opacity: 0.85; margin-top: 15px;">
+      "Las mejores historias de amor son las que se comparten con quienes siempre estuvieron."
+    </p>
+
+    <!-- Borde SVG inferior rasgado -->
+    <div class="torn-border-bottom">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,30 Q80,90 180,50 T380,80 T560,40 T740,80 T920,45 T1100,80 L1200,50 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <!-- FOTO DE FONDO 2 (SE ASOMA ENTRE CAPAS) -->
+  <div class="photo-background-section" style="height: 400px;">
+    <img src="foto2.jpg" alt="Foto Intermedia 1" id="imgIntermedia1">
+  </div>
+
+  <!-- CAPA PAPEL RASGADO 2 (COLOR CELESTE/TINT): CUENTA REGRESIVA -->
+  <div class="torn-paper-layer color-tint">
+    <div class="torn-border-top">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,20 Q100,85 220,40 T440,75 T650,35 T860,75 T1040,35 L1200,60 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+
+    <span class="subtitle">¿Cuánto falta?</span>
+    <h2>El Gran Día</h2>
+    <div class="countdown-grid">
+      <div class="time-box"><span id="cd-dias">00</span><small>Días</small></div>
+      <div class="time-box"><span id="cd-horas">00</span><small>Hs</small></div>
+      <div class="time-box"><span id="cd-min">00</span><small>Min</small></div>
+      <div class="time-box"><span id="cd-seg">00</span><small>Seg</small></div>
+    </div>
+    <p style="font-size: 0.95rem; margin-top: 15px;">Confirmar asistencia antes del 1° de Octubre</p>
+    <a id="linkFormulario" href="#" target="_blank" class="btn">
+      <i class="fa-solid fa-check"></i> Confirmar Asistencia
+    </a>
+
+    <div class="torn-border-bottom">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,20 Q100,85 220,40 T440,75 T650,35 T860,75 T1040,35 L1200,60 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <!-- FOTO DE FONDO 3 -->
+  <div class="photo-background-section" style="height: 380px;">
+    <img src="foto3.jpg" alt="Foto Intermedia 2" id="imgIntermedia2">
+  </div>
+
+  <!-- CAPA PAPEL RASGADO 3: CEREMONIA Y FIESTA -->
+  <div id="secEventos" class="torn-paper-layer">
+    <div class="torn-border-top">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,40 Q150,90 300,50 T600,80 T900,40 Q1050,80 1200,50 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+
+    <span class="subtitle">Ubicación & Horarios</span>
+    <h2>Te Esperamos</h2>
+    
+    <div id="modCeremonia" class="event-box">
+      <i class="fa-solid fa-ring icon-decor"></i>
+      <h3>Ceremonia</h3>
+      <p id="txtFechaCeremonia" style="font-weight: bold; margin: 5px 0;">Sábado 23 de Octubre</p>
+      <p id="txtHoraCeremonia" style="margin: 0;">17:30 hs - Puntual</p>
+      <p id="txtLugarCeremonia" style="font-style: italic; margin-top: 5px;">Parroquia San José</p>
+      <p id="txtDirCeremonia" style="font-size: 0.9rem; opacity: 0.8;">Av. Misiones 3232</p>
+      <a id="linkMapCeremonia" href="#" target="_blank" class="btn" style="margin: 10px auto 0; padding: 8px 20px; font-size: 0.8rem;">
+        <i class="fa-solid fa-location-dot"></i> Ver Ubicación
+      </a>
+    </div>
+
+    <div id="modFiesta" class="event-box">
+      <i class="fa-solid fa-champagne-glasses icon-decor"></i>
+      <h3>Fiesta</h3>
+      <p id="txtFechaFiesta" style="font-weight: bold; margin: 5px 0;">Sábado 23 de Octubre</p>
+      <p id="txtHoraFiesta" style="margin: 0;">21:00 hs - Puntual</p>
+      <p id="txtLugarFiesta" style="font-style: italic; margin-top: 5px;">Salón Aurora Palace</p>
+      <p id="txtDirFiesta" style="font-size: 0.9rem; opacity: 0.8;">Av. Las Flores 2020</p>
+      <a id="linkMapFiesta" href="#" target="_blank" class="btn" style="margin: 10px auto 0; padding: 8px 20px; font-size: 0.8rem;">
+        <i class="fa-solid fa-location-dot"></i> Ver Ubicación
+      </a>
+    </div>
+
+    <div class="torn-border-bottom">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,40 Q150,90 300,50 T600,80 T900,40 Q1050,80 1200,50 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <!-- FOTO DE FONDO 4 -->
+  <div class="photo-background-section" style="height: 380px;">
+    <img src="foto4.jpg" alt="Foto Intermedia 3" id="imgIntermedia3">
+  </div>
+
+  <!-- CAPA PAPEL RASGADO 4: DRESS CODE & REGALOS -->
+  <div class="torn-paper-layer color-tint">
+    <div class="torn-border-top">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,25 Q120,80 250,35 T500,75 T750,30 T1000,75 L1200,40 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+
+    <!-- Dress Code -->
+    <div id="secDressCode" style="margin-bottom: 40px;">
+      <i class="fa-solid fa-shirt icon-decor"></i>
+      <h2 style="font-size: 2.5rem;">Dress Code</h2>
+      <h3 id="txtDressCodeTitulo" style="text-transform: uppercase; letter-spacing: 2px; font-size: 1.2rem; margin: 5px 0;">Formal / Elegante</h3>
+      <p id="txtDressCodeDesc" style="font-size: 1rem; max-width: 320px; margin: 0 auto;">
+        Nos encantaría verte lucir increíble. Reservamos el color blanco exclusivamente para la novia.
+      </p>
+    </div>
+
+    <!-- Regalos -->
+    <div id="secRegalos">
+      <i class="fa-solid fa-gift icon-decor"></i>
+      <h2>Regalos</h2>
+      <p id="txtRegaloDesc" style="font-size: 1rem; max-width: 320px; margin: 0 auto 15px;">
+        Si querés acompañar este día con un regalo, podés hacerlo por transferencia:
+      </p>
+      
+      <button class="btn" onclick="toggleRegalos()">
+        <i class="fa-solid fa-credit-card"></i> Ver Datos Bancarios
+      </button>
+
+      <div id="cajaDatosBancarios" class="gift-box">
+        <div class="gift-row">
+          <span><strong>Titular:</strong> <span id="bancoTitular">-</span></span>
+          <button class="copy-btn" onclick="copiarTexto('bancoTitular')">Copiar</button>
+        </div>
+        <div class="gift-row">
+          <span><strong>Banco:</strong> <span id="bancoNombre">-</span></span>
+        </div>
+        <div class="gift-row">
+          <span><strong>N° Cuenta:</strong> <span id="bancoCuenta">-</span></span>
+          <button class="copy-btn" onclick="copiarTexto('bancoCuenta')">Copiar</button>
+        </div>
+        <div class="gift-row" id="filaCBU">
+          <span><strong>CBU / ALIAS:</strong> <span id="bancoCbu">-</span></span>
+          <button class="copy-btn" onclick="copiarTexto('bancoCbu')">Copiar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="torn-border-bottom">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,25 Q120,80 250,35 T500,75 T750,30 T1000,75 L1200,40 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <!-- FOTO DE FONDO 5 -->
+  <div class="photo-background-section" style="height: 350px;">
+    <img src="foto5.jpg" alt="Foto Intermedia 4" id="imgIntermedia4">
+  </div>
+
+  <!-- CAPA PAPEL RASGADO 5: PLAYLIST, ÁLBUM, IG Y DESPEDIDA -->
+  <div class="torn-paper-layer">
+    <div class="torn-border-top">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,35 Q90,85 200,45 T400,75 T600,35 T800,80 T1000,40 L1200,70 L1200,120 L0,120 Z"></path>
+      </svg>
+    </div>
+
+    <!-- Carrusel de Fotos -->
+    <div id="secFotos" style="margin-bottom: 40px;">
+      <span class="subtitle">Nuestros Recuerdos</span>
+      <h2>Álbum de Fotos</h2>
+      <div class="carousel">
+        <button class="carousel-btn prev-btn" onclick="moverCarrusel(-1)">&#10094;</button>
+        <div class="carousel-track" id="carruselTrack"></div>
+        <button class="carousel-btn next-btn" onclick="moverCarrusel(1)">&#10095;</button>
+      </div>
+    </div>
+
+    <!-- Playlist -->
+    <div id="secPlaylist" style="margin-bottom: 35px;">
+      <i class="fa-solid fa-music icon-decor"></i>
+      <h3>¡Armá la Fiesta!</h3>
+      <p id="txtPlaylistDesc" style="font-size: 1rem;">¿Qué canción no puede faltar en la pista de baile?</p>
+      <a id="linkPlaylist" href="#" target="_blank" class="btn" style="margin-top: 10px;">
+        <i class="fa-solid fa-headphones"></i> Sugerir Canción
+      </a>
+    </div>
+
+    <!-- Subir Fotos Invitados -->
+    <div id="secAlbumInvitados" style="margin-bottom: 35px;">
+      <i class="fa-solid fa-camera icon-decor"></i>
+      <h3>Álbum Compartido</h3>
+      <p id="txtAlbumDesc" style="font-size: 1rem;">¡Subí las fotos y videos que tomes en nuestra boda!</p>
+      <a id="linkAlbum" href="#" target="_blank" class="btn" style="margin-top: 10px;">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Subir mis Fotos
+      </a>
+    </div>
+
+    <!-- Instagram -->
+    <div id="secInstagram" style="margin-bottom: 40px;">
+      <i class="fa-brands fa-instagram icon-decor"></i>
+      <h3 id="txtHashtag" style="font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 600; color: var(--texto-principal);">#NuestraBoda2026</h3>
+      <a id="linkInstagram" href="#" target="_blank" class="btn" style="margin-top: 10px;">
+        <i class="fa-brands fa-instagram"></i> Etiquétanos en IG
+      </a>
+    </div>
+
+    <!-- Despedida -->
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.08);">
+      <p id="txtDespedida" style="font-family: var(--fuente-titulo); font-size: 2.8rem; color: var(--acento); margin: 10px 0;">
+        ¡Gracias por acompañarnos!
+      </p>
+      <small style="opacity: 0.5; font-size: 0.8rem; font-family: 'Montserrat', sans-serif;">Diseñado con ♥</small>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ==========================================================================
+     PANEL DE CONTROL GENERAL (CONFIG)
+     ========================================================================== -->
+<script>
+const CONFIG = {
+  // 🎨 PALETAS DISPONIBLES: "boho" | "terracota" | "olivo" | "rosa" | "clasico" | "celeste"
+  paleta: "celeste", 
+  
+  // 🔤 FUENTES DISPONIBLES: "romantica" | "bohemia" | "moderna" | "clasica" | "editorial"
+  estiloFuentes: "romantica",
+
+  // 📝 TEXTOS PRINCIPALES
+  preTitulo: "¡Nos casamos!",
+  nombresNovios: "Gimena & Martín",
+  fechaPortada: "23 de Octubre de 2026",
+  frasePortada: "Crecí, cambié y aprendí. Y quiero festejarlo con quienes estuvieron siempre.",
+  
+  // ⏱️ FECHA DEL EVENTO (Para la cuenta regresiva: AÑO-MES-DIA T HORA:MINUTO:SEGUNDO)
+  fechaEvento: "2026-10-23T21:00:00",
+
+  // 🖼️ FOTOS PARA LOS FONDOS RASGADOS (Nombres exactos en tu GitHub)
+  fotoPortada: "foto1.jpg",
+  fotoFondo2: "foto2.jpg",
+  fotoFondo3: "foto3.jpg",
+  fotoFondo4: "foto4.jpg",
+  fotoFondo5: "foto5.jpg",
+
+  // 📷 FOTOS PARA EL CARRUSEL
+  fotosCarrete: ["foto1.jpg", "foto2.jpg", "foto3.jpg", "foto4.jpg"],
+
+  // ⛪ CEREMONIA (Pon false para desactivar)
+  mostrarCeremonia: true,
+  fechaCeremonia: "Sábado 23 de Octubre",
+  horaCeremonia: "17:30 hs",
+  lugarCeremonia: "Parroquia San José",
+  direccionCeremonia: "Av. Misiones 3232",
+  gpsCeremonia: "https://maps.google.com",
+
+  // 🎉 FIESTA
+  mostrarFiesta: true,
+  fechaFiesta: "Sábado 23 de Octubre",
+  horaFiesta: "21:00 hs - Puntual",
+  lugarFiesta: "Salón Marquis Eventos",
+  direccionFiesta: "Ruta 102 Gral. Líber Seregni km 25",
+  gpsFiesta: "https://maps.google.com",
+
+  // 👗 DRESS CODE
+  mostrarDressCode: true,
+  dressCodeTitulo: "FORMAL",
+  dressCodeDesc: "Nos encantaría verte lucir increíble. Reservamos el color blanco exclusivamente para la novia.",
+
+  // 🎁 REGALOS
+  mostrarRegalos: true,
+  regaloDesc: "Si querés acompañar este día con un regalo, podés hacerlo por transferencia.",
+  datosBancarios: {
+    titular: "Emma Broli",
+    banco: "BROU",
+    cuenta: "CA $ 110832869-00001",
+    cbuOAlias: "CA USD 110832869-00002" // O Alias
+  },
+
+  // 🎵 PLAYLIST
+  mostrarPlaylist: true,
+  playlistDesc: "¿Qué canción no puede faltar en la pista de baile? Ayúdanos a armar la playlist perfecta.",
+  linkPlaylist: "https://forms.google.com",
+
+  // ☁️ ÁLBUM COMPARTIDO
+  mostrarAlbumInvitados: true,
+  albumDesc: "¡Queremos ver la fiesta desde tus ojos! Compartí las fotos y videos que saques.",
+  linkAlbum: "https://forms.google.com",
+
+  // 📷 INSTAGRAM
+  mostrarInstagram: true,
+  hashtag: "#GimeYMartin2026",
+  linkInstagram: "https://instagram.com",
+
+  // 💌 RSVP (Confirmación de asistencia)
+  linkFormularioRSVP: "https://forms.google.com",
+
+  // 👋 DESPEDIDA FOOTER
+  textoDespedida: "¡Gracias por acompañarnos!"
+};
+
+/* --------------------------------------------------------------------------
+   🎨 PALETAS Y FUENTES
+   -------------------------------------------------------------------------- */
+const PALETAS_COLORES = {
+  celeste:   { fondo: "#e8eff5", papel: "#ffffff", texto: "#3a3532", acento: "#4a6c8c", caja: "#f0f5f9", boton: "#2c4a6c" },
+  boho:      { fondo: "#ede8e3", papel: "#ffffff", texto: "#3d3834", acento: "#a8896c", caja: "#f7f4f0", boton: "#8c6f50" },
+  terracota: { fondo: "#f0e6e1", papel: "#ffffff", texto: "#382923", acento: "#c86d51", caja: "#f9f3f0", boton: "#b5573b" },
+  olivo:     { fondo: "#e8ede7", papel: "#ffffff", texto: "#2d332d", acento: "#6a7b62", caja: "#f2f6f1", boton: "#4d5e45" },
+  rosa:      { fondo: "#f7eaee", papel: "#ffffff", texto: "#3b3033", acento: "#c47589", caja: "#fdf5f7", boton: "#a8576d" },
+  clasico:   { fondo: "#e6ecf2", papel: "#ffffff", texto: "#222222", acento: "#2b4c7e", caja: "#f0f4f8", boton: "#1d3557" }
+};
+
+const PALETAS_FUENTES = {
+  romantica: { titulo: "'Great Vibes', cursive", texto: "'Cormorant Garamond', serif" },
+  bohemia:   { titulo: "'Parisienne', cursive", texto: "'Lora', serif" },
+  moderna:   { titulo: "'Montserrat', sans-serif", texto: "'Poppins', sans-serif" },
+  clasica:   { titulo: "'Cinzel', serif", texto: "'EB Garamond', serif" },
+  editorial: { titulo: "'Playfair Display', serif", texto: "'Josefin Sans', sans-serif" }
+};
+
+/* --------------------------------------------------------------------------
+   🚀 LÓGICA DE PROGRAMACIÓN AUTOMÁTICA
+   -------------------------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  aplicarDiseno();
+  inyectarDatos();
+  gestionarSecciones();
+  iniciarCuentaRegresiva();
+  armarCarrusel();
+  configurarMusica();
+});
+
+function aplicarDiseno() {
+  const root = document.documentElement;
+  const col = PALETAS_COLORES[CONFIG.paleta] || PALETAS_COLORES.celeste;
+  const fnt = PALETAS_FUENTES[CONFIG.estiloFuentes] || PALETAS_FUENTES.romantica;
+
+  root.style.setProperty("--fondo-general", col.fondo);
+  root.style.setProperty("--color-papel", col.papel);
+  root.style.setProperty("--texto-principal", col.texto);
+  root.style.setProperty("--acento", col.acento);
+  root.style.setProperty("--caja-secundaria", col.caja);
+  root.style.setProperty("--boton-fondo", col.boton);
+  root.style.setProperty("--fuente-titulo", fnt.titulo);
+  root.style.setProperty("--fuente-texto", fnt.texto);
+}
+
+function inyectarDatos() {
+  document.getElementById("txtPreTitulo").innerText = CONFIG.preTitulo;
+  document.getElementById("txtNombres").innerText = CONFIG.nombresNovios;
+  document.getElementById("txtFechaPortada").innerText = CONFIG.fechaPortada;
+  document.getElementById("txtFrasePortada").innerText = `"${CONFIG.frasePortada}"`;
+  
+  // Fotos de fondo
+  document.getElementById("imgPortada").src = CONFIG.fotoPortada;
+  if(document.getElementById("imgIntermedia1")) document.getElementById("imgIntermedia1").src = CONFIG.fotoFondo2 || CONFIG.fotoPortada;
+  if(document.getElementById("imgIntermedia2")) document.getElementById("imgIntermedia2").src = CONFIG.fotoFondo3 || CONFIG.fotoPortada;
+  if(document.getElementById("imgIntermedia3")) document.getElementById("imgIntermedia3").src = CONFIG.fotoFondo4 || CONFIG.fotoPortada;
+  if(document.getElementById("imgIntermedia4")) document.getElementById("imgIntermedia4").src = CONFIG.fotoFondo5 || CONFIG.fotoPortada;
+
+  // Eventos
+  document.getElementById("txtFechaCeremonia").innerText = CONFIG.fechaCeremonia;
+  document.getElementById("txtHoraCeremonia").innerText = CONFIG.horaCeremonia;
+  document.getElementById("txtLugarCeremonia").innerText = CONFIG.lugarCeremonia;
+  document.getElementById("txtDirCeremonia").innerText = CONFIG.direccionCeremonia;
+  document.getElementById("linkMapCeremonia").href = CONFIG.gpsCeremonia;
+
+  document.getElementById("txtFechaFiesta").innerText = CONFIG.fechaFiesta;
+  document.getElementById("txtHoraFiesta").innerText = CONFIG.horaFiesta;
+  document.getElementById("txtLugarFiesta").innerText = CONFIG.lugarFiesta;
+  document.getElementById("txtDirFiesta").innerText = CONFIG.direccionFiesta;
+  document.getElementById("linkMapFiesta").href = CONFIG.gpsFiesta;
+
+  // Dress code & Regalos
+  document.getElementById("txtDressCodeTitulo").innerText = CONFIG.dressCodeTitulo;
+  document.getElementById("txtDressCodeDesc").innerText = CONFIG.dressCodeDesc;
+  document.getElementById("txtRegaloDesc").innerText = CONFIG.regaloDesc;
+  document.getElementById("bancoTitular").innerText = CONFIG.datosBancarios.titular;
+  document.getElementById("bancoNombre").innerText = CONFIG.datosBancarios.banco;
+  document.getElementById("bancoCuenta").innerText = CONFIG.datosBancarios.cuenta;
+  
+  if(CONFIG.datosBancarios.cbuOAlias) {
+    document.getElementById("bancoCbu").innerText = CONFIG.datosBancarios.cbuOAlias;
+  } else {
+    document.getElementById("filaCBU").style.display = "none";
+  }
+
+  // Enlaces y extras
+  document.getElementById("txtPlaylistDesc").innerText = CONFIG.playlistDesc;
+  document.getElementById("linkPlaylist").href = CONFIG.linkPlaylist;
+  document.getElementById("txtAlbumDesc").innerText = CONFIG.albumDesc;
+  document.getElementById("linkAlbum").href = CONFIG.linkAlbum;
+  document.getElementById("txtHashtag").innerText = CONFIG.hashtag;
+  document.getElementById("linkInstagram").href = CONFIG.linkInstagram;
+  document.getElementById("linkFormulario").href = CONFIG.linkFormularioRSVP;
+  document.getElementById("txtDespedida").innerText = CONFIG.textoDespedida;
+}
+
+function gestionarSecciones() {
+  if (!CONFIG.mostrarCeremonia) document.getElementById("modCeremonia").classList.add("hidden");
+  if (!CONFIG.mostrarFiesta) document.getElementById("modFiesta").classList.add("hidden");
+  if (!CONFIG.mostrarCeremonia && !CONFIG.mostrarFiesta) document.getElementById("secEventos").classList.add("hidden");
+  if (!CONFIG.mostrarDressCode) document.getElementById("secDressCode").classList.add("hidden");
+  if (!CONFIG.mostrarRegalos) document.getElementById("secRegalos").classList.add("hidden");
+  if (!CONFIG.mostrarPlaylist) document.getElementById("secPlaylist").classList.add("hidden");
+  if (!CONFIG.mostrarAlbumInvitados) document.getElementById("secAlbumInvitados").classList.add("hidden");
+  if (!CONFIG.mostrarInstagram) document.getElementById("secInstagram").classList.add("hidden");
+}
+
+function iniciarCuentaRegresiva() {
+  const meta = new Date(CONFIG.fechaEvento).getTime();
+  const actualizar = () => {
+    const ahora = new Date().getTime();
+    const dif = meta - ahora;
+    if (dif < 0) {
+      document.querySelector(".countdown-grid").innerHTML = "<h3 style='grid-column: 1/-1; color: var(--acento);'>¡Hoy es el gran día! 🎉</h3>";
+      return;
+    }
+    const d = Math.floor(dif / (1000 * 60 * 60 * 24));
+    const h = Math.floor((dif % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const m = Math.floor((dif % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((dif % (1000 * 60)) / 1000);
+    document.getElementById("cd-dias").innerText = d < 10 ? "0" + d : d;
+    document.getElementById("cd-horas").innerText = h < 10 ? "0" + h : h;
+    document.getElementById("cd-min").innerText = m < 10 ? "0" + m : m;
+    document.getElementById("cd-seg").innerText = s < 10 ? "0" + s : s;
+  };
+  actualizar();
+  setInterval(actualizar, 1000);
+}
+
+let posCarrusel = 0;
+function armarCarrusel() {
+  const track = document.getElementById("carruselTrack");
+  if (!CONFIG.fotosCarrete || CONFIG.fotosCarrete.length === 0) {
+    document.getElementById("secFotos").classList.add("hidden");
+    return;
+  }
+  CONFIG.fotosCarrete.forEach((foto) => {
+    const slide = document.createElement("div");
+    slide.className = "carousel-slide";
+    slide.innerHTML = `<img src="${foto}" alt="Recuerdo">`;
+    track.appendChild(slide);
+  });
+}
+function moverCarrusel(dir) {
+  const total = CONFIG.fotosCarrete.length;
+  posCarrusel = (posCarrusel + dir + total) % total;
+  document.getElementById("carruselTrack").style.transform = `translateX(-${posCarrusel * 100}%)`;
+}
+setInterval(() => moverCarrusel(1), 4000);
+
+function toggleRegalos() {
+  const caja = document.getElementById("cajaDatosBancarios");
+  caja.style.display = caja.style.display === "block" ? "none" : "block";
+}
+function copiarTexto(id) {
+  const texto = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(texto).then(() => alert("¡Dato copiado al portapapeles! 📋"));
+}
+
+function configurarMusica() {
+  const audio = document.getElementById("audioPlayer");
+  const btn = document.getElementById("btnMusic");
+  const icon = document.getElementById("iconMusic");
+  const intentoPlay = audio.play();
+
+  if (intentoPlay !== undefined) {
+    intentoPlay.then(() => {
+      btn.classList.add("playing");
+      icon.className = "fa-solid fa-volume-high";
+    }).catch(() => {
+      const iniciarAlTocar = () => {
+        audio.play().then(() => {
+          btn.classList.add("playing");
+          icon.className = "fa-solid fa-volume-high";
+        });
+        document.removeEventListener("click", iniciarAlTocar);
+        document.removeEventListener("scroll", iniciarAlTocar);
+        document.removeEventListener("touchstart", iniciarAlTocar);
+      };
+      document.addEventListener("click", iniciarAlTocar, { once: true });
+      document.addEventListener("scroll", iniciarAlTocar, { once: true });
+      document.addEventListener("touchstart", iniciarAlTocar, { once: true });
+    });
+  }
+}
+function toggleMusic() {
+  const audio = document.getElementById("audioPlayer");
+  const btn = document.getElementById("btnMusic");
+  const icon = document.getElementById("iconMusic");
+  if (audio.paused) {
+    audio.play();
+    btn.classList.add("playing");
+    icon.className = "fa-solid fa-volume-high";
+  } else {
+    audio.pause();
+    btn.classList.remove("playing");
+    icon.className = "fa-solid fa-volume-xmark";
+  }
+}
+</script>
+</body>
+</html>
